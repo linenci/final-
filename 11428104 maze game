@@ -1,0 +1,90 @@
+#include <iostream>
+#include "rlutil.h"
+
+using namespace std;
+using namespace rlutil;
+
+const int WIDTH = 10;
+const int HEIGHT = 10;
+
+// 迷宮地圖
+char maze[HEIGHT][WIDTH] = {
+    {'#','#','#','#','#','#','#','#','#','#'},
+    {'#','P',' ',' ','#',' ',' ',' ',' ','#'},
+    {'#',' ','#',' ','#',' ','#','#',' ','#'},
+    {'#',' ','#',' ',' ',' ',' ','#',' ','#'},
+    {'#',' ','#','#','#','#',' ','#',' ','#'},
+    {'#',' ',' ',' ',' ','#',' ',' ',' ','#'},
+    {'#','#','#','#',' ','#','#','#',' ','#'},
+    {'#',' ',' ','#',' ',' ',' ','#',' ','#'},
+    {'#',' ',' ',' ',' ','#',' ',' ','E','#'},
+    {'#','#','#','#','#','#','#','#','#','#'}
+};
+
+int px = 1, py = 1; // 玩家起始位置
+int steps = 0;
+
+// 繪製迷宮
+void drawMaze() {
+    cls();
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            locate(x + 1, y + 1);
+
+            if (maze[y][x] == '#') {
+                setColor(BLUE);
+            } else if (maze[y][x] == 'P') {
+                setColor(YELLOW);
+            } else if (maze[y][x] == 'E') {
+                setColor(GREEN);
+            } else {
+                setColor(WHITE);
+            }
+
+            cout << maze[y][x];
+        }
+    }
+    setColor(WHITE);
+    locate(1, HEIGHT + 2);
+    cout << "步數：" << steps << "   ESC：離開遊戲";
+}
+
+// 主程式
+int main() {
+    hidecursor();
+
+    while (true) {
+        drawMaze();
+        int key = getkey();
+
+        int nx = px;
+        int ny = py;
+
+        if (key == KEY_UP) ny--;
+        else if (key == KEY_DOWN) ny++;
+        else if (key == KEY_LEFT) nx--;
+        else if (key == KEY_RIGHT) nx++;
+        else if (key == KEY_ESCAPE) break;
+
+        if (maze[ny][nx] != '#') {
+            maze[py][px] = ' ';
+            px = nx;
+            py = ny;
+            steps++;
+
+            if (maze[py][px] == 'E') {
+                cls();
+                setColor(GREEN);
+                cout << "🎉 通關成功！\n";
+                cout << "總步數：" << steps << endl;
+                anykey();
+                break;
+            }
+
+            maze[py][px] = 'P';
+        }
+    }
+
+    showcursor();
+    return 0;
+}
